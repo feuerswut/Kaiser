@@ -1,4 +1,22 @@
-.claude
-.old
-bin
-obj
+# Claude / local tooling
+.claude/
+
+# Rust
+target/
+*.pdb
+
+# Node / frontend
+node_modules/
+dist/
+.vite/
+
+# Tauri generated
+kaiser-app/src-tauri/gen/
+kaiser-app/src-tauri/WixTools/
+
+# Old build artifacts
+.old/
+bin/
+obj/
+
+.cargo/
