@@ -18,7 +18,7 @@ impl AppState {
         let store = KaiserConfigStore::new(store_path.clone());
         let mut manager = MonarchDisplayManager::new(shared, store)
             .expect("failed to initialize display manager");
-        manager.set_confirmation_timeout(std::time::Duration::from_secs(15));
+        manager.set_confirmation_timeout(std::time::Duration::from_secs(20));
         Self {
             manager: Mutex::new(manager),
             backend,
