@@ -32,43 +32,27 @@ pub fn run() {
     let default_level = "trace,tao=warn,wry=warn,tauri=warn";
     #[cfg(not(debug_assertions))]
     let default_level = "info";
+    use env_logger::fmt::style::{AnsiColor, Style};
+    use env_logger::WriteStyle;
+
+    let trace_s = Style::new().fg_color(Some(AnsiColor::BrightBlack.into())).italic();
+    let debug_lvl = Style::new().bold();
+    let info_lvl  = Style::new().fg_color(Some(AnsiColor::Green.into())).bold();
+    let warn_s    = Style::new().fg_color(Some(AnsiColor::Yellow.into()));
+    let error_s   = Style::new().fg_color(Some(AnsiColor::Red.into()));
+
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(default_level))
-        .format(|buf, record| {
+        .write_style(WriteStyle::Always)
+        .format(move |buf, record| {
             use std::io::Write;
-            use env_logger::fmt::style::{AnsiColor, Style};
-
-            let (level_style, line_style) = match record.level() {
-                log::Level::Error => (
-                    Style::new().fg_color(Some(AnsiColor::Red.into())).bold(),
-                    Some(Style::new().fg_color(Some(AnsiColor::Red.into()))),
-                ),
-                log::Level::Warn => (
-                    Style::new().fg_color(Some(AnsiColor::Yellow.into())).bold(),
-                    Some(Style::new().fg_color(Some(AnsiColor::Yellow.into()))),
-                ),
-                log::Level::Info => (
-                    Style::new().fg_color(Some(AnsiColor::Green.into())).bold(),
-                    None,
-                ),
-                log::Level::Debug => (
-                    Style::new().bold(),
-                    None,
-                ),
-                log::Level::Trace => (
-                    Style::new().fg_color(Some(AnsiColor::BrightBlack.into())).italic(),
-                    Some(Style::new().fg_color(Some(AnsiColor::BrightBlack.into())).italic()),
-                ),
-            };
-
-            let reset = Style::new();
-            let level_str = format!("{level_style}{:<5}{reset}", record.level());
             let target = record.target();
-            let message = record.args();
-
-            if let Some(ls) = line_style {
-                writeln!(buf, "{level_str} {ls}[{target}] {message}{reset}")
-            } else {
-                writeln!(buf, "{level_str} [{target}] {message}")
+            let msg = record.args();
+            match record.level() {
+                log::Level::Trace => writeln!(buf, "{}TRACE [{target}] {msg}{}", trace_s.render(), trace_s.render_reset()),
+                log::Level::Debug => writeln!(buf, "{}DEBUG{} [{target}] {msg}", debug_lvl.render(), debug_lvl.render_reset()),
+                log::Level::Info  => writeln!(buf, "{}INFO {} [{target}] {msg}", info_lvl.render(),  info_lvl.render_reset()),
+                log::Level::Warn  => writeln!(buf, "{}WARN  [{target}] {msg}{}", warn_s.render(),    warn_s.render_reset()),
+                log::Level::Error => writeln!(buf, "{}ERROR [{target}] {msg}{}", error_s.render(),   error_s.render_reset()),
             }
         })
         .init();
