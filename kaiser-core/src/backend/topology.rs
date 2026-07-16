@@ -292,7 +292,7 @@ impl DisplayBackend for KaiserBackend {
                 cache.last_snapshot.as_ref().unwrap().clone()
             };
 
-            let (pending_clones_for_verify, _) = self.get_pending_display_ops();
+            let (_, pending_clones_for_verify) = self.get_pending_display_ops();
             let result = self.try_apply_once(&layout, &snapshot);
 
             match result {
